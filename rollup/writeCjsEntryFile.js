@@ -32,8 +32,8 @@ if (process.env.NODE_ENV === 'production') {
       ? [name, 'js'].join('.')
       : [name, formatName, 'js'].join('.');
 
-  return fs.outputFile(path.join(tsCompilerOptions.outDir, filename), contents);
+  return fs.outputFile(path.join('dist', 'index.js'), contents);
 }
 
 writeCjsEntryFile('index');
-writeCjsEntryFile('index', 'ie11', 'tsconfig.ie11.json');
+// writeCjsEntryFile('index', 'ie11', 'tsconfig.ie11.json');

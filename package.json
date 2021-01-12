@@ -30,9 +30,6 @@
     "changeset": "changeset",
     "release": "changeset publish"
   },
-  "dependencies": {
-    "lodash": "^4.17.20"
-  },
   "devDependencies": {
     "@babel/core": "^7.11.4",
     "@babel/plugin-transform-runtime": "^7.10.4",
@@ -41,8 +38,9 @@
     "@rollup/plugin-commonjs": "^15.0.0",
     "@rollup/plugin-node-resolve": "^9.0.0",
     "@rollup/plugin-replace": "^2.3.3",
-    "@types/react": "^16.9.43",
-    "@types/react-dom": "^16.9.8",
+    "@types/lodash": "^4.14.167",
+    "@types/react": "^17.0.0",
+    "@types/react-dom": "^17.0.0",
     "@types/react-native": "^0.63.17",
     "@types/react-test-renderer": "^16.9.2",
     "@typescript-eslint/eslint-plugin": "^4.1.0",
@@ -60,6 +58,7 @@
     "eslint-plugin-react-hooks": "^4.0.8",
     "husky": "^4.3.0",
     "lint-staged": "^10.2.11",
+    "lodash": "4.17.20",
     "metro-react-native-babel-preset": "^0.63.0",
     "prettier": "^2.0.5",
     "react": "^16.13.1",
@@ -84,5 +83,8 @@
     "validation",
     "typescript",
     "react-hooks"
-  ]
+  ],
+  "dependencies": {
+    "@types/lodash": "^4.14.167"
+  }
 }

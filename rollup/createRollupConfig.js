@@ -11,6 +11,10 @@ import { safePackageName } from './safePackageName';
 import { pascalcase } from './pascalcase';
 import pkg from '../package.json';
 
+import React from 'react';
+import ReactIs from 'react-is';
+import ReactDOM from 'react-dom';
+
 export function createRollupConfig(options, callback) {
   const name = options.name || safePackageName(pkg.name);
   const umdName = options.umdName || pascalcase(safePackageName(pkg.name));
@@ -50,14 +54,17 @@ export function createRollupConfig(options, callback) {
         clean: true,
       }),
       resolve(),
-      options.format === 'umd' &&
-        commonjs({
-          include: /\/node_modules\//,
-        }),
-      options.env !== undefined &&
-        replace({
-          'process.env.NODE_ENV': JSON.stringify(options.env),
-        }),
+      commonjs({
+        include: /node_modules/,
+        namedExports: {
+          'react-is': Object.keys(ReactIs),
+          'react': Object.keys(React),
+          'react-dom': Object.keys(ReactDOM),
+        }
+      }),
+      replace({
+        "process.env.NODE_ENV": JSON.stringify("development")
+      }),
       sourcemaps(),
       shouldMinify &&
         terser({
