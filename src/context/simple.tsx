@@ -19,6 +19,15 @@ interface UseRet<T> {
 
 export class SimpleState<T> {
   private state: T;
+  public readKeys: string[] = [];
+  private proxyReadState = new Proxy(this.state as any, {
+    get(target: T, p: PropertyKey): any {
+      return (target as any)[p];
+    },
+    set(): boolean {
+      return true;
+    },
+  });
   constructor(iniState: T) {
     this.state = iniState;
   }
@@ -36,14 +45,14 @@ export class SimpleState<T> {
     if (keys.length > 0) {
       this.event.emit(EventName.onChange, {
         data: null,
-        state: nextState,
+        state: this.getReadState(),
         type: 'onChange',
         keys: keys,
       });
     }
   };
-  public getState = () => {
-    return { ...this.state };
+  public getReadState = () => {
+    return this.proxyReadState as T;
   };
 }
 
@@ -59,15 +68,33 @@ export function getSimpleContext<S>(iniState?: S) {
       </Context.Provider>
     );
   };
-  const useSimpleContext: (subKeys: string[]) => UseRet<S> = (subKeys) => {
+  const useSimpleContext: UseCtxKeys<S> & UseCtxCb<S> = (
+    subKeys: any[] | Function,
+  ) => {
     const ctx = useContext(Context);
-    const [state, setState] = useState<S>(ctx.getState());
-    ctx.event.useSubscription(EventName.onChange, function ({ keys, state }) {
-      if (subKeys.find((k) => keys.includes(k))) {
-        setState(state);
-      }
-    });
-    return { state: state, update: ctx.update };
+    const [state, setState] = useState<S>(ctx.getReadState());
+    ctx.event.useSubscription(
+      EventName.onChange,
+      function ({ keys, state: nextState }) {
+        if (Array.isArray(subKeys)) {
+          if (subKeys.find((k) => keys.includes(k))) {
+            setState(nextState);
+          }
+        } else {
+          const prev: any[] = subKeys(state);
+          const next: any[] = subKeys(nextState);
+
+          if (prev.find((v, idx) => next[idx] !== v)) {
+            setState(nextState);
+          }
+        }
+      },
+    );
+    return { state: ctx.getReadState(), update: ctx.update };
   };
   return { Provider, useSimpleContext };
 }
+
+type UseCtxKeys<S> = (subKeys: (keyof S)[]) => UseRet<S>;
+type UseCtxCb<S> = (cb: (state: S) => any[]) => UseRet<S>;
+
